@@ -15,3 +15,8 @@ class BooksSpider(scrapy.Spider):
                 'price' : book.css('div.product_price p.price_color::text').get(),
                 'image' : response.urljoin(book.css('div.image_container img::attr(src)').get()),
             }
+
+        next_page = response.css('li.next a::attr(href)').get()
+
+        if next_page:
+            yield response.follow(next_page, callback=self.parse)
