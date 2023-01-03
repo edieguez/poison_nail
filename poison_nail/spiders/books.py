@@ -1,5 +1,8 @@
 from scrapy.linkextractors import LinkExtractor
+from scrapy.loader import ItemLoader
 from scrapy.spiders import CrawlSpider, Rule
+
+from poison_nail.items import PoisonNailItem
 
 
 class BooksSpider(CrawlSpider):
@@ -14,8 +17,10 @@ class BooksSpider(CrawlSpider):
         books = response.css('article.product_pod')
 
         for book in books:
-            yield {
-                'name': book.css('h3 a::attr(title)').get(),
-                'price': book.css('div.product_price p.price_color::text').get(),
-                'image': response.urljoin(book.css('div.image_container img::attr(src)').get()),
-            }
+            item_loader = ItemLoader(PoisonNailItem(), book, response)
+
+            item_loader.add_css('name', 'h3 > a::attr(title)')
+            item_loader.add_css('price', 'div.product_price > p.price_color::text')
+            item_loader.add_css('image', 'div.image_container > a > img::attr(src)')
+
+            yield item_loader.load_item()
