@@ -16,7 +16,13 @@ def get_full_link(url, loader_context):
     return response.urljoin(url)
 
 
-class PoisonNailItem(scrapy.Item):
+class BookItem(scrapy.Item):
     name = scrapy.Field(output_processor=TakeFirst())
     price = scrapy.Field(input_processor=MapCompose(remove_currency), output_processor=TakeFirst())
     image = scrapy.Field(input_processor=MapCompose(get_full_link), output_processor=TakeFirst())
+
+
+class QuoteItem(scrapy.Item):
+    text = scrapy.Field()
+    author = scrapy.Field()
+    tags = scrapy.Field()

@@ -2,7 +2,7 @@ from scrapy.linkextractors import LinkExtractor
 from scrapy.loader import ItemLoader
 from scrapy.spiders import CrawlSpider, Rule
 
-from poison_nail.items import PoisonNailItem
+from poison_nail.items import BookItem
 
 
 class BooksSpider(CrawlSpider):
@@ -17,7 +17,7 @@ class BooksSpider(CrawlSpider):
         books = response.css('article.product_pod')
 
         for book in books:
-            item_loader = ItemLoader(PoisonNailItem(), book, response)
+            item_loader = ItemLoader(BookItem(), book, response)
 
             item_loader.add_css('name', 'h3 > a::attr(title)')
             item_loader.add_css('price', 'div.product_price > p.price_color::text')
