@@ -33,7 +33,7 @@ ROBOTSTXT_OBEY = True
 # COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
-# TELNETCONSOLE_ENABLED = False
+TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
 # DEFAULT_REQUEST_HEADERS = {
@@ -91,11 +91,15 @@ REQUEST_FINGERPRINTER_IMPLEMENTATION = '2.7'
 TWISTED_REACTOR = 'twisted.internet.asyncioreactor.AsyncioSelectorReactor'
 
 # Playwright settings
-PLAYWRIGHT_LAUNCH_OPTIONS = {
-    "headless": False,
-    "timeout": 20 * 1_000,
-}
-DOWNLOAD_HANDLERS = {
-    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-}
+PLAYWRIGHT_SETTINGS = dict(
+    # Optional. Possible values: 'chromium', 'firefox', 'webkit'. Default: 'chromium'
+    PLAYWRIGHT_BROWSER_TYPE='chromium',
+    PLAYWRIGHT_LAUNCH_OPTIONS={
+        "headless": False,  # Optional. Default: True
+        "timeout": 20 * 1_000,  # Optional. Default: 30_000
+    },
+    DOWNLOAD_HANDLERS={ # Mandatory to use Playwright
+        "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+    }
+)

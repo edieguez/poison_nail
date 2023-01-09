@@ -1,5 +1,6 @@
 import scrapy
 
+import poison_nail.settings
 from poison_nail.items import QuoteItem
 
 
@@ -7,6 +8,7 @@ class QuotesSpider(scrapy.Spider):
     name = 'quotes-js'
     allowed_domains = ['quotes.toscrape.com']
     start_urls = ['https://quotes.toscrape.com/js']
+    custom_settings = poison_nail.settings.PLAYWRIGHT_SETTINGS
 
     def start_requests(self):
         for url in self.start_urls:
