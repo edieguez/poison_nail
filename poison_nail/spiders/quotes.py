@@ -1,23 +1,18 @@
-import scrapy
+from scrapy.linkextractors import LinkExtractor
+from scrapy.spiders import CrawlSpider, Rule
 
-import poison_nail.settings
 from poison_nail.items import QuoteItem
 
 
-class QuotesSpider(scrapy.Spider):
-    name = 'quotes-js'
+class QuotesSpider(CrawlSpider):
+    name = 'quotes'
     allowed_domains = ['quotes.toscrape.com']
-    start_urls = ['https://quotes.toscrape.com/js']
-    custom_settings = poison_nail.settings.PLAYWRIGHT_SETTINGS
+    start_urls = ['http://quotes.toscrape.com']
+    rules = (
+        Rule(LinkExtractor(allow=r'/page/\d+/', deny='/tag'), callback='parse_item', follow=True),
+    )
 
-    def start_requests(self):
-        for url in self.start_urls:
-            yield self._send_request(url)
-
-    async def parse(self, response, **kwargs):
-        page = response.meta['playwright_page']
-        await page.close()
-
+    def parse_item(self, response):
         for quote in response.css('div.quote'):
             quote_item = QuoteItem()
             quote_item['text'] = quote.css('span.text::text').get()
@@ -25,20 +20,3 @@ class QuotesSpider(scrapy.Spider):
             quote_item['tags'] = quote.css('div.tags a.tag::text').getall()
 
             yield quote_item
-
-        next_page = response.css('.next>a ::attr(href)').get()
-
-        if next_page:
-            next_page_url = response.urljoin(next_page)
-            yield self._send_request(next_page_url)
-
-    def _send_request(self, url):
-        return scrapy.Request(url, meta={
-            'playwright': True,
-            'playwright_include_page': True,
-            'errback': self.errback,
-        })
-
-    async def errback(self, failure):
-        page = failure.request.meta['playwright_page']
-        await page.close()
